@@ -1,0 +1,37 @@
+# Eclipse
+.classpath
+.project
+.settings/
+
+# Intellij
+.idea/*
+!.idea/runConfigurations
+*.iml
+*.iws
+classes/
+
+# Mac
+.DS_Store
+
+# Maven
+log/
+target/
+
+# Gradle
+.gradle/
+out/
+build/
+results/
+
+# Elasticsearch
+elasticsearch-data
+
+# Scala Worksheet
+*_worksheet.scala.sc
+
+# Test output
+*Test*.txt
+total_orders
+
+# Logs
+logs/*.log

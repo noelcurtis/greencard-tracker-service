@@ -1,0 +1,137 @@
+apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'java'
+
+apply from: rootDir.toString() + "/_common_builds/versions.gradle"
+
+subprojects {
+
+    group 'com.noelcurtis'
+
+    apply plugin: "java"
+    apply plugin: 'scala'
+    apply plugin: "scalaStyle"
+    apply plugin: "com.github.maiflai.scalatest"
+
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        jcenter()
+        maven {
+            url "http://conjars.org/repo"
+        }
+        maven {
+            url "http://clojars.org/repo"
+        }
+    }
+
+    /**
+     * Configuration overrides for dependencies
+     */
+    configurations.all {
+        // force asm to a particular version because there are collisions between Hadoop and Pegdown
+        exclude group: "asm"
+        // asm has moved to org.ow2.asm as of > 3.0
+        ResolutionStrategy.force "org.ow2.asm:asm:4.0"
+        ResolutionStrategy.force "org.ow2.asm:asm-util:4.0"
+        ResolutionStrategy.force "org.ow2.asm:asm-analysis:4.0"
+        ResolutionStrategy.force "org.ow2.asm:asm-commons:4.0"
+        ResolutionStrategy.force "org.ow2.asm:asm-tree:4.0"
+    }
+
+    /**
+     * Scalastyle configuration
+     */
+    scalaStyle {
+        configLocation = rootDir.toString() + "/_common_builds/scalastyle_config.xml"
+        includeTestSourceDirectory = true
+        source = "src/main/scala"
+        testSource = "src/test/scala"
+    }
+
+    check.dependsOn("scalaStyle")
+
+    /**
+     * A base set of dependencies that most everyone needs for spark jobs
+     */
+    dependencies {
+        // for logging
+        compile "com.typesafe.scala-logging:scala-logging-slf4j_$project.scalaMajorVersion:$project.scalaLoggingVersion"
+
+        // scala required for spark
+        compile "org.scala-lang:scala-library:$project.scalaVersion"
+        compile "org.scala-lang:scala-compiler:$project.scalaVersion"
+        compile "org.scala-lang:scala-reflect:$project.scalaVersion"
+        compile "org.scala-lang:scalap:$project.scalaVersion"
+        // joda time
+        compile "joda-time:joda-time:$jodaVersion"
+
+        // for writing unit, integration tests
+        testCompile "org.scalatest:scalatest_$project.scalaMajorVersion:$project.scalaTestVersion"
+        testCompile "org.mockito:mockito-all:$project.mokitoVersion"
+
+        // required to create HTML reports for scalatest
+        testRuntime 'org.pegdown:pegdown:1.6.0'
+    }
+
+    /**
+     * The test task excludes tests tagged as ExternalTest
+     */
+    test {
+        tags {
+
+        }
+    }
+
+    /**
+     * The test all task runs all tests
+     */
+    task testAll(type: Test) {
+        description "A task to run all tests including one tagged to be excluded"
+    }
+
+}
+
+/**
+ *  Task to build a Fat jar excluding some baggage from Hadoop dependencies
+ */
+shadowJar {
+    exclude "META-INF/*"
+    exclude "*.aut"
+    exclude "AUTHORS"
+    exclude "*LICENSE*"
+    exclude "NOTICE"
+    dependencies {
+        exclude(dependency('org.scala-lang:scala-library:.*'))
+        exclude(dependency('org.codehaus.groovy:.*:.*'))
+        exclude(dependency('org.slf4j:slf4j-log4j12:.*'))
+        exclude(dependency('org.slf4j:.*:.*'))
+        exclude(dependency("com.typesafe.akka:akka-remote_$project.scalaMajorVersion:.*"))
+    }
+    append 'reference.conf'
+    zip64 true
+}
+
+def artifactoryUrl = "https://artifactory.ghbeta.com/artifactory"
+def artifactoryRepo = "garcon-libs"
+def artifactoryUser = "jenkins-test"
+def artifactoryPassword = "brain position health tall"
+
+
+task ci {
+    description "Spark integrate task, runs tests, checks and build"
+
+    doLast {
+        println("finished running $project.name 'spark_ci'")
+    }
+}
+
+task go {
+    description "Spark integrate and distribute task"
+
+    doLast {
+        println("finished running $project.name 'go'")
+    }
+}
