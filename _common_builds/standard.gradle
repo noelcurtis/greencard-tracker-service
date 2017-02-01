@@ -95,17 +95,12 @@ subprojects {
 }
 
 /**
- *  Task to build a Fat jar excluding some baggage from Hadoop dependencies
+ *  Task to build a Fat jar
  */
 shadowJar {
     append 'reference.conf'
     zip64 true
 }
-
-def artifactoryUrl = "https://artifactory.ghbeta.com/artifactory"
-def artifactoryRepo = "garcon-libs"
-def artifactoryUser = "jenkins-test"
-def artifactoryPassword = "brain position health tall"
 
 
 task ci {
