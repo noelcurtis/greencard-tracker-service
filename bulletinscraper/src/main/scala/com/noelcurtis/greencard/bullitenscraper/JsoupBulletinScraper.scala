@@ -3,6 +3,7 @@ package com.noelcurtis.greencard.bullitenscraper
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
+import com.typesafe.config.Config
 import com.typesafe.scalalogging.slf4j.LazyLogging
 import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
@@ -14,15 +15,16 @@ trait BulletinScraper {
   def fetchLatestBulliten(): Bulletin
 }
 
-class JsoupBulletinScraper(baseUrl: String = "https://travel.state.gov/content/visas/en/law-and-policy/bulletin.html")(implicit jsoupManager: JsoupManager)
+class JsoupBulletinScraper(config: Config)(implicit jsoupManager: JsoupManager)
   extends BulletinScraper with LazyLogging {
 
   lazy val recentDateFormat = DateTimeFormatter.ofPattern("yyyy-MMMM-dd")
+  val baseUrl: String = config.getString("app.visaBulletinBaseUrl") + config.getString("app.rootBulletinPath")
 
   def fetchLatestBulliten(): Bulletin = {
     logger.info("Starting to fetch latest Bulletin")
     val bulletinList: Document = jsoupManager.getDocument(baseUrl)
-    val recentBulletinUrl: String = "https://travel.state.gov" + bulletinList.select("div.recentbulletins a").first().attr("href")
+    val recentBulletinUrl: String = config.getString("app.visaBulletinBaseUrl") + bulletinList.select("div.recentbulletins a").first().attr("href")
     val recentDate = parseRecentDate(recentBulletinUrl)
     logger.info("Found latest bulletin url [{}] and date [{}]", recentBulletinUrl, recentDate)
 
