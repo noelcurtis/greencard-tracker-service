@@ -34,11 +34,11 @@ subprojects {
         // force asm to a particular version because there are collisions between Hadoop and Pegdown
         exclude group: "asm"
         // asm has moved to org.ow2.asm as of > 3.0
-        ResolutionStrategy.force "org.ow2.asm:asm:4.0"
-        ResolutionStrategy.force "org.ow2.asm:asm-util:4.0"
-        ResolutionStrategy.force "org.ow2.asm:asm-analysis:4.0"
-        ResolutionStrategy.force "org.ow2.asm:asm-commons:4.0"
-        ResolutionStrategy.force "org.ow2.asm:asm-tree:4.0"
+        resolutionStrategy.force "org.ow2.asm:asm:4.0"
+        resolutionStrategy.force "org.ow2.asm:asm-util:4.0"
+        resolutionStrategy.force "org.ow2.asm:asm-analysis:4.0"
+        resolutionStrategy.force "org.ow2.asm:asm-commons:4.0"
+        resolutionStrategy.force "org.ow2.asm:asm-tree:4.0"
     }
 
     /**

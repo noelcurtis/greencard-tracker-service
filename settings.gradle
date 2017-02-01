@@ -1,2 +1,3 @@
 rootProject.name = 'greencard'
+include 'bullitenscraper'
 

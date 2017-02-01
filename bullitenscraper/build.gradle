@@ -1,0 +1,5 @@
+dependencies {
+    compile group: 'org.jsoup', name: 'jsoup', version: '1.10.2'
+    compile group: 'org.slf4j', name: 'slf4j-simple', version: "$project.sl4jVersion"
+    compile group: 'com.typesafe.play', name: 'play-json_2.11', version: "$project.playJsonVersion"
+}
