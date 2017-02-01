@@ -98,18 +98,6 @@ subprojects {
  *  Task to build a Fat jar excluding some baggage from Hadoop dependencies
  */
 shadowJar {
-    exclude "META-INF/*"
-    exclude "*.aut"
-    exclude "AUTHORS"
-    exclude "*LICENSE*"
-    exclude "NOTICE"
-    dependencies {
-        exclude(dependency('org.scala-lang:scala-library:.*'))
-        exclude(dependency('org.codehaus.groovy:.*:.*'))
-        exclude(dependency('org.slf4j:slf4j-log4j12:.*'))
-        exclude(dependency('org.slf4j:.*:.*'))
-        exclude(dependency("com.typesafe.akka:akka-remote_$project.scalaMajorVersion:.*"))
-    }
     append 'reference.conf'
     zip64 true
 }

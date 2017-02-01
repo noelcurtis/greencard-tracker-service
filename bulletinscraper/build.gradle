@@ -1,5 +1,9 @@
+apply from: "../_common_builds/standard.gradle"
+
 dependencies {
     compile group: 'org.jsoup', name: 'jsoup', version: '1.10.2'
     compile group: 'org.slf4j', name: 'slf4j-simple', version: "$project.sl4jVersion"
     compile group: 'com.typesafe.play', name: 'play-json_2.11', version: "$project.playJsonVersion"
+    compile group: 'com.amazonaws', name: 'aws-lambda-java-core', version: '1.1.0'
+    compile group: 'com.amazonaws', name: 'aws-java-sdk-s3', version: '1.9.18'
 }

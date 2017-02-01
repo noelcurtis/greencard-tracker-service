@@ -3,7 +3,6 @@ package com.noelcurtis.greencard.bullitenscraper
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.typesafe.scalalogging.slf4j.LazyLogging
 import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
@@ -11,37 +10,37 @@ import play.api.libs.json.Json
 
 import scala.collection.JavaConversions._
 
-class BullitenManager(baseUrl: String = "https://travel.state.gov/content/visas/en/law-and-policy/bulletin.html")(implicit jsoupManager: JsoupManager) extends LazyLogging {
+trait BulletinScraper {
+  def fetchLatestBulliten(): Bulletin
+}
 
-  val recentDateFormat = DateTimeFormatter.ofPattern("yyyy-MMMM-dd")
+class JsoupBulletinScraper(baseUrl: String = "https://travel.state.gov/content/visas/en/law-and-policy/bulletin.html")(implicit jsoupManager: JsoupManager)
+  extends BulletinScraper with LazyLogging {
 
-  def fetchLatestBulliten(): Bulliten = {
-    val bullitenList: Document = jsoupManager.getDocument(baseUrl)
-    val recentBullitenUrl: String = "https://travel.state.gov" + bullitenList.select("div.recentbulletins a").first().attr("href")
-    val recentDate = parseRecentDate(recentBullitenUrl)
-    logger.info("Found latest bulliten url [{}] and date [{}]", recentBullitenUrl, recentDate)
+  lazy val recentDateFormat = DateTimeFormatter.ofPattern("yyyy-MMMM-dd")
 
-    val latestBulliten: Document = jsoupManager.getDocument(recentBullitenUrl)
+  def fetchLatestBulliten(): Bulletin = {
+    logger.info("Starting to fetch latest Bulletin")
+    val bulletinList: Document = jsoupManager.getDocument(baseUrl)
+    val recentBulletinUrl: String = "https://travel.state.gov" + bulletinList.select("div.recentbulletins a").first().attr("href")
+    val recentDate = parseRecentDate(recentBulletinUrl)
+    logger.info("Found latest bulletin url [{}] and date [{}]", recentBulletinUrl, recentDate)
+
+    val latestBulliten: Document = jsoupManager.getDocument(recentBulletinUrl)
     val elements: Elements = latestBulliten.select("table.grid")
     logger.debug(s"Found [${elements.size()}] tables")
-
     logger.info("Parsing tables ...")
-    val finalActionFamilySponsoredTable: FamilySponsoredTable = FamilySponsoredTable(parseFamilySponsoredRows(elements, 0))
-    val familySponsoredTable: FamilySponsoredTable = FamilySponsoredTable(parseFamilySponsoredRows(elements, 1))
-    val finalActionEmploymentSponsoredTable: EmploymentSponsoredTable = EmploymentSponsoredTable(parseEmploymentSponsoredRows(elements, 2))
-    val employmentSponsoredTable: EmploymentSponsoredTable = EmploymentSponsoredTable(parseEmploymentSponsoredRows(elements, 3))
 
-    val bulliten: Bulliten = Bulliten(
+    val bulliten: Bulletin = Bulletin(
       recentDate,
-      finalActionFamilySponsoredTable,
-      familySponsoredTable,
-      finalActionEmploymentSponsoredTable,
-      employmentSponsoredTable
+      parseFamilySponsoredRows(elements, 0),
+      parseFamilySponsoredRows(elements, 1),
+      parseEmploymentSponsoredRows(elements, 2),
+      parseEmploymentSponsoredRows(elements, 3)
     )
-    logger.info("Completed building Bulliten for url [{}] and date [{}]", recentBullitenUrl, recentDate)
-    logger.info("Bulliten {}", bulliten)
-//    val jsValue = Json.toJson(bulliten)
-    println(new ObjectMapper().writeValueAsString(bulliten))
+
+    logger.info("Completed building Bulliten for url [{}] and date [{}]", recentBulletinUrl, recentDate)
+    logger.debug("Bulliten {}", Json.toJson(bulliten))
     bulliten
   }
 
