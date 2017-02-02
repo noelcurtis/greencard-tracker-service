@@ -30,7 +30,7 @@ class JsoupBulletinScraper(config: Config)(implicit jsoupManager: JsoupManager)
 
     val latestBulliten: Document = jsoupManager.getDocument(recentBulletinUrl)
     val elements: Elements = latestBulliten.select("table.grid")
-    logger.debug(s"Found [${elements.size()}] tables")
+    logger.info(s"Found [${elements.size()}] tables")
     logger.info("Parsing tables ...")
 
     val bulliten: Bulletin = Bulletin(
@@ -48,6 +48,7 @@ class JsoupBulletinScraper(config: Config)(implicit jsoupManager: JsoupManager)
 
   def parseFamilySponsoredRows(elements: Elements, position: Int): List[FamilySponsoredRow] = {
     val elementList = elements.get(position).select("tr").toList
+    logger.info(s"Parsing family sponsored rows at position [$position] with count [${elements.size()}]")
 
     elementList.subList(1, elementList.size).map(element => {
       FamilySponsoredRow(family = element.select("td").get(0).html().replace("<br>", "").replace("<br>", ""),
@@ -61,6 +62,7 @@ class JsoupBulletinScraper(config: Config)(implicit jsoupManager: JsoupManager)
 
   def parseEmploymentSponsoredRows(elements: Elements, position: Int): List[EmploymentSponsoredRow] = {
     val elementList = elements.get(position).select("tr").toList
+    logger.info(s"Parsing employment sponsored rows at position [$position] with count [${elements.size()}]")
 
     elementList.subList(1, elementList.size).map(element => {
       if (position == 5) {
