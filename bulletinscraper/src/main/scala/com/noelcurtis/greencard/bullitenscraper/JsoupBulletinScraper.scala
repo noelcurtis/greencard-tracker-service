@@ -36,9 +36,9 @@ class JsoupBulletinScraper(config: Config)(implicit jsoupManager: JsoupManager)
     val bulliten: Bulletin = Bulletin(
       recentDate,
       parseFamilySponsoredRows(elements, 0),
-      parseFamilySponsoredRows(elements, 1),
-      parseEmploymentSponsoredRows(elements, 2),
-      parseEmploymentSponsoredRows(elements, 3)
+      parseFamilySponsoredRows(elements, 3),
+      parseEmploymentSponsoredRows(elements, 4),
+      parseEmploymentSponsoredRows(elements, 5)
     )
 
     logger.info("Completed building Bulliten for url [{}] and date [{}]", recentBulletinUrl, recentDate)
@@ -63,12 +63,24 @@ class JsoupBulletinScraper(config: Config)(implicit jsoupManager: JsoupManager)
     val elementList = elements.get(position).select("tr").toList
 
     elementList.subList(1, elementList.size).map(element => {
-      EmploymentSponsoredRow(family = element.select("td").get(0).html().replace("<br>", "").replace("<br>", ""),
-        chargeabilityAreas = DateOrCurrent.fromString(element.select("td").get(1).html()),
-        china = DateOrCurrent.fromString(element.select("td").get(2).html()),
-        india = DateOrCurrent.fromString(element.select("td").get(3).html()),
-        mexico = DateOrCurrent.fromString(element.select("td").get(4).html()),
-        phillippines = DateOrCurrent.fromString(element.select("td").get(5).html()))
+      if (position == 5) {
+        EmploymentSponsoredRow(family = element.select("td").get(0).html().replace("<br>", "").replace("<br>", ""),
+          chargeabilityAreas = DateOrCurrent.fromString(element.select("td").get(1).html()),
+          china = DateOrCurrent.fromString(element.select("td").get(2).html()),
+          india = DateOrCurrent.fromString(element.select("td").get(3).html()),
+          mexico = DateOrCurrent.fromString(element.select("td").get(4).html()),
+          phillippines = DateOrCurrent.fromString(element.select("td").get(5).html()))
+      } else {
+        EmploymentSponsoredRow(family = element.select("td").get(0).html().replace("<br>", "").replace("<br>", ""),
+          chargeabilityAreas = DateOrCurrent.fromString(element.select("td").get(1).html()),
+          china = DateOrCurrent.fromString(element.select("td").get(2).html()),
+          india = DateOrCurrent.fromString(element.select("td").get(4).html()),
+          mexico = DateOrCurrent.fromString(element.select("td").get(5).html()),
+          phillippines = DateOrCurrent.fromString(element.select("td").get(6).html()),
+          elSalvadorGuatamelaHonduras = Some(DateOrCurrent.fromString(element.select("td").get(3).html()))
+        )
+
+      }
     }).toList
   }
 

@@ -14,11 +14,12 @@ package object bullitenscraper {
                       finalActionEmploymentSponsoredTable: List[EmploymentSponsoredRow],
                       employmentSponsoredTable: List[EmploymentSponsoredRow])
 
-  case class FamilySponsoredRow(family: String, chargeabilityAreas: DateOrCurrent, china: DateOrCurrent, india: DateOrCurrent,
-                                mexico: DateOrCurrent, phillippines: DateOrCurrent)
+  case class FamilySponsoredRow(family: String, chargeabilityAreas: DateOrCurrent, china: DateOrCurrent,
+                                india: DateOrCurrent, mexico: DateOrCurrent, phillippines: DateOrCurrent)
 
   case class EmploymentSponsoredRow(family: String, chargeabilityAreas: DateOrCurrent, china: DateOrCurrent,
-                                    india: DateOrCurrent, mexico: DateOrCurrent, phillippines: DateOrCurrent)
+                                    india: DateOrCurrent, mexico: DateOrCurrent, phillippines: DateOrCurrent,
+                                    elSalvadorGuatamelaHonduras: Option[DateOrCurrent] = None)
 
   case class DateOrCurrent(date: Option[String] = None, isCurrent: Boolean = true)
 
@@ -28,7 +29,7 @@ package object bullitenscraper {
 
   implicit val EmploymentSponsoredRowWrites: Writes[EmploymentSponsoredRow] = Json.writes[EmploymentSponsoredRow]
 
-  implicit val BullitenWrites: Writes[Bulletin] = Json.writes[Bulletin]
+  implicit val BulletinWrites: Writes[Bulletin] = Json.writes[Bulletin]
 
   object DateOrCurrent {
 

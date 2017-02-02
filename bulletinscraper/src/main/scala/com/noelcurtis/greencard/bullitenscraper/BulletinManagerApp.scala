@@ -11,6 +11,10 @@ class BulletinManagerApp {
   val bulletinPersistenceService: BulletinPersistenceService = new S3BulletinPersistenceService(config)
 
   def handler(name: String, context: Context): String = {
-    bulletinPersistenceService.insertBulletin(bulletinManager.fetchLatestBulliten())
+    val bulletin = bulletinManager.fetchLatestBulliten()
+    if (config.getBoolean("app.toggleOutputToS3")) {
+      bulletinPersistenceService.insertBulletin(bulletin)
+    }
+    "Done"
   }
 }
